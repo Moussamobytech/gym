@@ -42,6 +42,9 @@ public class User {
 
     private LocalDateTime createdAt;
 
+    @Column(name = "push_token")
+    private String pushToken;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

@@ -3,6 +3,7 @@ package com.gym.controller;
 import com.gym.model.CheckIn;
 import com.gym.model.Role;
 import com.gym.model.User;
+import com.gym.model.PaymentStatus;
 import com.gym.repository.CheckInRepository;
 import com.gym.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @CrossOrigin(origins = "*")
@@ -35,6 +37,57 @@ public class ManagerController {
         }
 
         return ResponseEntity.ok(userRepository.findByManagerIdAndRole(managerOpt.get().getId(), Role.CLIENT));
+    }
+
+    @PutMapping("/members/{memberId}/status")
+    public ResponseEntity<?> updateMemberStatus(@PathVariable Long memberId, @RequestBody com.gym.dto.UpdateMemberStatusRequest request) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Optional<User> managerOpt = userRepository.findByPhoneNumber(auth.getName());
+        
+        if (managerOpt.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Optional<User> memberOpt = userRepository.findById(memberId);
+        if (memberOpt.isEmpty() || !memberOpt.get().getManagerId().equals(managerOpt.get().getId())) {
+            return ResponseEntity.badRequest().body("Membre introuvable ou non autorisé.");
+        }
+
+        User member = memberOpt.get();
+        if ("PAID".equalsIgnoreCase(request.getStatus())) {
+            member.setPaymentStatus(PaymentStatus.PAID);
+            member.setSubscriptionEndDate(LocalDate.now().plusMonths(1));
+        } else if ("EXPIRED".equalsIgnoreCase(request.getStatus())) {
+            member.setPaymentStatus(PaymentStatus.EXPIRED);
+            member.setSubscriptionEndDate(LocalDate.now().minusDays(1));
+        } else {
+            member.setPaymentStatus(PaymentStatus.PENDING);
+            member.setSubscriptionEndDate(LocalDate.now());
+        }
+
+        userRepository.save(member);
+        return ResponseEntity.ok("Statut mis à jour.");
+    }
+
+    @DeleteMapping("/members/{memberId}")
+    public ResponseEntity<?> deleteMember(@PathVariable Long memberId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Optional<User> managerOpt = userRepository.findByPhoneNumber(auth.getName());
+        
+        if (managerOpt.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Optional<User> memberOpt = userRepository.findById(memberId);
+        if (memberOpt.isEmpty() || !memberOpt.get().getManagerId().equals(managerOpt.get().getId())) {
+            return ResponseEntity.badRequest().body("Membre introuvable ou non autorisé.");
+        }
+
+        // Must delete associated check-ins first because of foreign key constraint
+        checkInRepository.deleteByUserId(memberOpt.get().getId());
+        userRepository.delete(memberOpt.get());
+        
+        return ResponseEntity.ok("Membre supprimé avec succès.");
     }
 
     @GetMapping("/profile")

@@ -38,6 +38,9 @@ public class AuthController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private com.gym.service.NotificationService notificationService;
+
     @PostMapping("/login")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthRequest authenticationRequest) throws Exception {
         authenticationManager.authenticate(
@@ -72,6 +75,14 @@ public class AuthController {
                 java.util.Optional<User> managerOpt = userRepository.findByQrCodeId(registerRequest.getManagerQrCodeId());
                 if (managerOpt.isPresent()) {
                     user.setManagerId(managerOpt.get().getId());
+                    // Notify manager
+                    if (managerOpt.get().getPushToken() != null) {
+                        notificationService.sendPushNotification(
+                            managerOpt.get().getPushToken(),
+                            "Nouvelle Inscription \uD83D\uDCE3",
+                            registerRequest.getFirstName() + " vient de s'inscrire ! Pensez à valider sa demande."
+                        );
+                    }
                 } else {
                     return ResponseEntity.badRequest().body("Erreur: Code QR de la salle invalide.");
                 }
