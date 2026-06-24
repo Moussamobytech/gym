@@ -26,7 +26,7 @@ public class User {
     @Column(unique = true, nullable = false)
     private String qrCodeId;
 
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(columnDefinition = "TEXT")
     private String profileImageUrl;
 
     @Enumerated(EnumType.STRING)
