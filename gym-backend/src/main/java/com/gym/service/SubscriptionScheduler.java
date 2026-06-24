@@ -25,13 +25,11 @@ public class SubscriptionScheduler {
         List<User> users = userRepository.findAll();
         for (User user : users) {
             if (user.getSubscriptionEndDate() != null && user.getSubscriptionEndDate().isEqual(targetDate)) {
-                if (user.getPushToken() != null && !user.getPushToken().isEmpty()) {
-                    notificationService.sendPushNotification(
-                        user.getPushToken(),
-                        "Abonnement bientôt expiré ⏳",
-                        "Votre abonnement expire dans 3 jours. Pensez à le renouveler !"
-                    );
-                }
+                notificationService.createAndSendNotification(
+                    user,
+                    "Abonnement bientôt expiré ⏳",
+                    "Votre abonnement expire dans 3 jours. Pensez à le renouveler !"
+                );
             }
         }
     }

@@ -76,13 +76,11 @@ public class AuthController {
                 if (managerOpt.isPresent()) {
                     user.setManagerId(managerOpt.get().getId());
                     // Notify manager
-                    if (managerOpt.get().getPushToken() != null) {
-                        notificationService.sendPushNotification(
-                            managerOpt.get().getPushToken(),
-                            "Nouvelle Inscription \uD83D\uDCE3",
-                            registerRequest.getFirstName() + " vient de s'inscrire ! Pensez à valider sa demande."
-                        );
-                    }
+                    notificationService.createAndSendNotification(
+                        managerOpt.get(),
+                        "Nouvelle Inscription \uD83D\uDCE3",
+                        registerRequest.getFirstName() + " vient de s'inscrire ! Pensez à valider sa demande."
+                    );
                 } else {
                     return ResponseEntity.badRequest().body("Erreur: Code QR de la salle invalide.");
                 }

@@ -1,5 +1,9 @@
 package com.gym.service;
 
+import com.gym.model.Notification;
+import com.gym.model.User;
+import com.gym.repository.NotificationRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.HttpHeaders;
@@ -13,8 +17,25 @@ import java.util.List;
 @Service
 public class NotificationService {
 
+    @Autowired
+    private NotificationRepository notificationRepository;
+
     private final RestTemplate restTemplate = new RestTemplate();
     private final String EXPO_PUSH_API_URL = "https://exp.host/--/api/v2/push/send";
+
+    public void createAndSendNotification(User recipient, String title, String body) {
+        // Save to DB
+        Notification notification = new Notification();
+        notification.setRecipient(recipient);
+        notification.setTitle(title);
+        notification.setMessage(body);
+        notificationRepository.save(notification);
+
+        // Send Push Notification
+        if (recipient.getPushToken() != null && !recipient.getPushToken().isEmpty()) {
+            sendPushNotification(recipient.getPushToken(), title, body);
+        }
+    }
 
     public void sendPushNotification(String to, String title, String body) {
         if (to == null || to.isEmpty()) return;
