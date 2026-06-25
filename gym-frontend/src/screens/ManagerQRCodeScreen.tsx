@@ -18,7 +18,7 @@ export default function ManagerQRCodeScreen({ navigation }: Props) {
       </View>
       <View style={styles.qrCard}>
         <QRCode
-          value={`https://votre-site-gym.com/?managerId=${authState.qrCodeId || 'invalid-code'}`}
+          value={`https://gym-lac-zeta.vercel.app/?managerId=${authState.qrCodeId || 'invalid-code'}`}
           size={250}
           color={colors.background}
           backgroundColor={colors.text}
