@@ -8,11 +8,16 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
+import com.gym.model.User;
+import com.gym.model.Role;
+import com.gym.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 @Configuration
 public class DataSeeder {
 
     @Bean
-    public CommandLineRunner initData(TrainingRepository trainingRepository) {
+    public CommandLineRunner initData(TrainingRepository trainingRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         return args -> {
             if (trainingRepository.count() == 0) {
                 trainingRepository.saveAll(List.of(
@@ -22,6 +27,16 @@ public class DataSeeder {
                     new Training(null, "CrossFit", "Entraînement fonctionnel à haute intensité pour un développement complet.", "crossfit.jpg", false),
                     new Training(null, "Zumba", "Fitness sur des rythmes latinos et internationaux pour brûler des calories en s'amusant.", "zumba.jpg", false)
                 ));
+            }
+
+            if (userRepository.findByPhoneNumber("admin").isEmpty()) {
+                User admin = new User();
+                admin.setFirstName("Super");
+                admin.setLastName("Admin");
+                admin.setPhoneNumber("admin");
+                admin.setPassword(passwordEncoder.encode("admin123"));
+                admin.setRole(Role.SUPER_ADMIN);
+                userRepository.save(admin);
             }
         };
     }

@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { AuthContext } from '../context/AuthContext';
 import { AuthContextType } from '../types/auth';
-import { RootStackParamList, ClientTabParamList, ManagerTabParamList } from '../types/navigation';
+import { RootStackParamList, ClientTabParamList, ManagerTabParamList, SuperAdminTabParamList } from '../types/navigation';
 import { API_URL } from '../config';
 import { usePushNotifications } from '../hooks/usePushNotifications';
 
@@ -25,9 +25,14 @@ import ManagerMembersScreen from '../screens/ManagerMembersScreen';
 import ManagerProfileScreen from '../screens/ManagerProfileScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
 
+// Super Admin Screens
+import SuperAdminDashboardScreen from '../screens/SuperAdminDashboardScreen';
+import SuperAdminCreateUserScreen from '../screens/SuperAdminCreateUserScreen';
+
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const ClientTab = createBottomTabNavigator<ClientTabParamList>();
 const ManagerTab = createBottomTabNavigator<ManagerTabParamList>();
+const SuperAdminTab = createBottomTabNavigator<SuperAdminTabParamList>();
 
 function ClientTabs() {
   return (
@@ -88,6 +93,31 @@ function ManagerTabs() {
   );
 }
 
+function SuperAdminTabs() {
+  return (
+    <SuperAdminTab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.border },
+        tabBarActiveTintColor: '#cba6f7', // Mocha Mauve for Super Admin
+        tabBarInactiveTintColor: colors.textSecondary,
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName: keyof typeof Ionicons.glyphMap;
+          if (route.name === 'Dashboard') {
+            iconName = focused ? 'shield' : 'shield-outline';
+          } else {
+            iconName = focused ? 'person-add' : 'person-add-outline';
+          }
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+      })}
+    >
+      <SuperAdminTab.Screen name="Dashboard" component={SuperAdminDashboardScreen} options={{ title: 'Comptes' }} />
+      <SuperAdminTab.Screen name="CreateUser" component={SuperAdminCreateUserScreen} options={{ title: 'Créer' }} />
+    </SuperAdminTab.Navigator>
+  );
+}
+
 export default function AppNavigator() {
   const { authState, isLoading } = useContext(AuthContext) as AuthContextType & { isLoading: boolean };
   const { expoPushToken } = usePushNotifications();
@@ -119,6 +149,10 @@ export default function AppNavigator() {
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="Register" component={RegisterScreen} />
             <Stack.Screen name="PreAuthScanner" component={PreAuthScannerScreen} />
+          </>
+        ) : authState.role === 'SUPER_ADMIN' ? (
+          <>
+            <Stack.Screen name="SuperAdminRoot" component={SuperAdminTabs} />
           </>
         ) : authState.role === 'MANAGER' ? (
           <>

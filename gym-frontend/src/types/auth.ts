@@ -1,4 +1,4 @@
-export type Role = 'CLIENT' | 'MANAGER';
+export type Role = 'CLIENT' | 'MANAGER' | 'SUPER_ADMIN';
 
 export interface AuthState {
   isAuthenticated: boolean;

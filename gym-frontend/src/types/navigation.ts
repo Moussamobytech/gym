@@ -16,6 +16,11 @@ export type ManagerTabParamList = {
   Members: undefined;
 };
 
+export type SuperAdminTabParamList = {
+  Dashboard: undefined;
+  CreateUser: undefined;
+};
+
 export type RootStackParamList = {
   Welcome: undefined;
   Login: { intent?: string, managerId?: string } | undefined;
@@ -23,6 +28,7 @@ export type RootStackParamList = {
   PreAuthScanner: undefined;
   ClientRoot: NavigatorScreenParams<ClientTabParamList>;
   ManagerRoot: NavigatorScreenParams<ManagerTabParamList>;
+  SuperAdminRoot: NavigatorScreenParams<SuperAdminTabParamList>;
   ManagerProfile: undefined;
   Notifications: undefined;
   ClientTrainingDetails: { training: Training };
@@ -37,5 +43,10 @@ export type ClientTabScreenProps<T extends keyof ClientTabParamList> = Composite
 
 export type ManagerTabScreenProps<T extends keyof ManagerTabParamList> = CompositeScreenProps<
   BottomTabScreenProps<ManagerTabParamList, T>,
+  RootStackScreenProps<keyof RootStackParamList>
+>;
+
+export type SuperAdminTabScreenProps<T extends keyof SuperAdminTabParamList> = CompositeScreenProps<
+  BottomTabScreenProps<SuperAdminTabParamList, T>,
   RootStackScreenProps<keyof RootStackParamList>
 >;
