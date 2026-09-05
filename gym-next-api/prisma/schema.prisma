@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CLIENT
+  MANAGER
+  SUPER_ADMIN
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  EXPIRED
+}
+
+model User {
+  id                  Int            @id @default(autoincrement())
+  firstName           String?
+  lastName            String?
+  phoneNumber         String         @unique
+  password            String
+  qrCodeId            String         @unique @default(uuid())
+  profileImageUrl     String?
+  role                Role
+  managerId           Int?
+  subscriptionEndDate DateTime?
+  paymentStatus       PaymentStatus?
+  createdAt           DateTime       @default(now())
+  pushToken           String?
+  checkIns            CheckIn[]
+}
+
+model Training {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+  imageUrl    String?
+  active      Boolean @default(true)
+}
+
+model CheckIn {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  timestamp DateTime @default(now())
+}
