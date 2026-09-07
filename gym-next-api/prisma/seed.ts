@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Seeding database...');
   // Default Super Admin
-  const adminPhone = 'admin';
+  const adminPhone = '91177784';
   const existingAdmin = await prisma.user.findUnique({ where: { phoneNumber: adminPhone } });
   if (!existingAdmin) {
     const hashedPassword = await bcrypt.hash('admin123', 10);
@@ -20,7 +20,7 @@ async function main() {
         role: 'SUPER_ADMIN',
       }
     });
-    console.log('Default super admin created (admin / admin123)');
+    console.log('Default super admin created (91177784 / admin123)');
   }
 
   // Default trainings
