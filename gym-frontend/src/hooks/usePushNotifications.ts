@@ -4,13 +4,15 @@ import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  } as any),
-});
+if (Platform.OS !== 'web') {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    } as any),
+  });
+}
 
 export function usePushNotifications() {
   const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
@@ -19,6 +21,8 @@ export function usePushNotifications() {
   const responseListener = useRef<Notifications.Subscription | null>(null);
 
   useEffect(() => {
+    if (Platform.OS === 'web') return;
+
     registerForPushNotificationsAsync().then(token => {
       if (token) setExpoPushToken(token);
     });
@@ -28,7 +32,7 @@ export function usePushNotifications() {
     });
 
     responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log(response);
+      console.log('Notification cliquée:', response);
     });
 
     return () => {
@@ -45,7 +49,11 @@ export function usePushNotifications() {
 }
 
 async function registerForPushNotificationsAsync() {
-  let token;
+  if (Platform.OS === 'web') {
+    return null;
+  }
+
+  let token: string | null = null;
 
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync('default', {
@@ -57,29 +65,29 @@ async function registerForPushNotificationsAsync() {
   }
 
   if (Device.isDevice) {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-    if (finalStatus !== 'granted') {
-      console.log('Failed to get push token for push notification!');
-      return null;
-    }
     try {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') {
+        console.log('Permission d\'envoi des notifications non accordée !');
+        return null;
+      }
       const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
       if (projectId) {
         token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
       } else {
         token = (await Notifications.getExpoPushTokenAsync()).data;
       }
-      console.log('Expo Push Token:', token);
+      console.log('Expo Push Token généré :', token);
     } catch (e) {
-      console.log('Error getting push token', e);
+      console.log('Erreur lors de la génération du Push Token:', e);
     }
   } else {
-    console.log('Must use physical device for Push Notifications');
+    console.log('Un appareil physique est recommandé pour recevoir les notifications Push');
   }
 
   return token;

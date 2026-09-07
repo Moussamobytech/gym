@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Seeding database...');
   // Default Super Admin
-  const adminPhone = '91177784';
+  const adminPhone = '91177783';
   const existingAdmin = await prisma.user.findUnique({ where: { phoneNumber: adminPhone } });
   if (!existingAdmin) {
     const hashedPassword = await bcrypt.hash('admin123', 10);
