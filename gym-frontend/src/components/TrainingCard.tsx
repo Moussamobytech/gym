@@ -18,8 +18,18 @@ const LOCAL_IMAGES: Record<string, any> = {
   "zumba.jpg": require('../../assets/trainings/zumba.jpg'),
 };
 
+export function getTrainingImageSource(imageUrl?: string | null) {
+  if (imageUrl && LOCAL_IMAGES[imageUrl]) {
+    return LOCAL_IMAGES[imageUrl];
+  }
+  if (imageUrl && /^https?:\/\//i.test(imageUrl)) {
+    return { uri: imageUrl };
+  }
+  return LOCAL_IMAGES["musculation.jpg"];
+}
+
 export const TrainingCard = ({ training, onPress, isManager, onToggleActive }: TrainingCardProps) => {
-  const imageSource = LOCAL_IMAGES[training.imageUrl] || { uri: training.imageUrl };
+  const imageSource = getTrainingImageSource(training.imageUrl);
 
   return (
     <TouchableOpacity 

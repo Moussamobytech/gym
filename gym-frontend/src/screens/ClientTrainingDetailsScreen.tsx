@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, ScrollView }
 import { colors } from '../theme/colors';
 import { RootStackScreenProps } from '../types/navigation';
 import { Ionicons } from '@expo/vector-icons';
+import { getTrainingImageSource } from '../components/TrainingCard';
 
 type Props = RootStackScreenProps<'ClientTrainingDetails'>;
 
@@ -11,7 +12,7 @@ export default function ClientTrainingDetailsScreen({ route, navigation }: Props
 
   return (
     <View style={styles.container}>
-      <ImageBackground source={{ uri: training.imageUrl }} style={styles.headerImage}>
+      <ImageBackground source={getTrainingImageSource(training.imageUrl)} style={styles.headerImage}>
         <View style={styles.overlay}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Ionicons name="close" size={28} color="#fff" />

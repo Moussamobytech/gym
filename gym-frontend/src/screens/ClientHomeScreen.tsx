@@ -17,13 +17,20 @@ export default function ClientHomeScreen({ navigation }: Props) {
 
   const fetchActiveTrainings = async () => {
     try {
-      const res = await fetch(`${API_URL}/trainings/active`, {
-        headers: { Authorization: `Bearer ${authState.jwt}` }
-      });
-      const data = await res.json();
-      setTrainings(data);
+      const headers = { Authorization: `Bearer ${authState.jwt}` };
+      let res = await fetch(`${API_URL}/trainings/active`, { headers });
+      let data = await res.json();
+
+      if (!Array.isArray(data)) {
+        res = await fetch(`${API_URL}/client/trainings`, { headers });
+        data = await res.json();
+      }
+
+      const list = Array.isArray(data) ? data : [];
+      setTrainings(list.filter((t: Training) => t.active !== false));
     } catch (e) {
       console.error(e);
+      setTrainings([]);
     } finally {
       setLoading(false);
     }
@@ -32,7 +39,7 @@ export default function ClientHomeScreen({ navigation }: Props) {
   useFocusEffect(
     useCallback(() => {
       fetchActiveTrainings();
-    }, [])
+    }, [authState.jwt])
   );
 
   const renderHeader = () => (
@@ -59,6 +66,9 @@ export default function ClientHomeScreen({ navigation }: Props) {
           )}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>Aucun exercice disponible pour le moment.</Text>
+          }
         />
       )}
     </View>
@@ -70,5 +80,6 @@ const styles = StyleSheet.create({
   listContent: { padding: 24, paddingTop: 48 },
   headerContainer: { marginBottom: 24 },
   sectionTitle: { color: colors.primary, fontSize: 24, fontWeight: 'bold', marginBottom: 8 },
-  subtitle: { color: colors.textSecondary, fontSize: 14, marginBottom: 16 }
+  subtitle: { color: colors.textSecondary, fontSize: 14, marginBottom: 16 },
+  emptyText: { color: colors.textSecondary, fontSize: 15, textAlign: 'center', marginTop: 24 }
 });

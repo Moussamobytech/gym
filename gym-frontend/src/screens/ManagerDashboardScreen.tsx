@@ -23,13 +23,19 @@ export default function ManagerDashboardScreen({ navigation }: Props) {
 
   const fetchTrainings = async () => {
     try {
-      const res = await fetch(`${API_URL}/trainings`, {
-        headers: { Authorization: `Bearer ${authState.jwt}` }
-      });
-      const data = await res.json();
-      setTrainings(data);
+      const headers = { Authorization: `Bearer ${authState.jwt}` };
+      let res = await fetch(`${API_URL}/trainings`, { headers });
+      let data = await res.json();
+
+      if (!Array.isArray(data)) {
+        res = await fetch(`${API_URL}/client/trainings`, { headers });
+        data = await res.json();
+      }
+
+      setTrainings(Array.isArray(data) ? data : []);
     } catch (e) {
       console.error(e);
+      setTrainings([]);
     } finally {
       setLoading(false);
     }
@@ -57,7 +63,7 @@ export default function ManagerDashboardScreen({ navigation }: Props) {
 
   useEffect(() => {
     fetchTrainings();
-  }, []);
+  }, [authState.jwt]);
 
   const handleToggle = async (id: number) => {
     setTrainings(prev => prev.map(t => t.id === id ? { ...t, active: !t.active } : t));
@@ -107,6 +113,11 @@ export default function ManagerDashboardScreen({ navigation }: Props) {
           )}
           contentContainerStyle={{ paddingBottom: 20 }}
           showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <Text style={{ color: colors.textSecondary, textAlign: 'center', marginTop: 24 }}>
+              Aucun exercice enregistré.
+            </Text>
+          }
         />
       )}
     </View>
