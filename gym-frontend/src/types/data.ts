@@ -1,8 +1,8 @@
 export interface Training {
   id: number;
   name: string;
-  description: string;
-  imageUrl: string;
+  description?: string | null;
+  imageUrl?: string | null;
   active: boolean;
 }
 

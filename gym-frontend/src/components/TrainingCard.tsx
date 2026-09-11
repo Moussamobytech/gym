@@ -18,18 +18,42 @@ const LOCAL_IMAGES: Record<string, any> = {
   "zumba.jpg": require('../../assets/trainings/zumba.jpg'),
 };
 
-export function getTrainingImageSource(imageUrl?: string | null) {
+const IMAGE_KEYS = Object.keys(LOCAL_IMAGES);
+
+function getImageKeyFromName(name?: string | null) {
+  const normalizedName = name?.trim().toLowerCase();
+  if (!normalizedName) return null;
+
+  if (normalizedName.includes('cardio')) return 'cardio.jpg';
+  if (normalizedName.includes('yoga')) return 'yoga.jpg';
+  if (normalizedName.includes('crossfit') || normalizedName.includes('cross fit')) return 'crossfit.jpg';
+  if (normalizedName.includes('zumba')) return 'zumba.jpg';
+  if (normalizedName.includes('musculation') || normalizedName.includes('muscu')) return 'musculation.jpg';
+
+  return null;
+}
+
+export function getTrainingImageSource(
+  imageUrl?: string | null,
+  trainingName?: string | null,
+  trainingId?: number,
+) {
   if (imageUrl && LOCAL_IMAGES[imageUrl]) {
     return LOCAL_IMAGES[imageUrl];
   }
   if (imageUrl && /^https?:\/\//i.test(imageUrl)) {
     return { uri: imageUrl };
   }
-  return LOCAL_IMAGES["musculation.jpg"];
+
+  const imageKey = getImageKeyFromName(trainingName);
+  if (imageKey) return LOCAL_IMAGES[imageKey];
+
+  const fallbackIndex = Math.abs(trainingId ?? 0) % IMAGE_KEYS.length;
+  return LOCAL_IMAGES[IMAGE_KEYS[fallbackIndex]];
 }
 
 export const TrainingCard = ({ training, onPress, isManager, onToggleActive }: TrainingCardProps) => {
-  const imageSource = getTrainingImageSource(training.imageUrl);
+  const imageSource = getTrainingImageSource(training.imageUrl, training.name, training.id);
 
   return (
     <TouchableOpacity 
