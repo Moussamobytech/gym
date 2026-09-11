@@ -38,8 +38,11 @@ export function getTrainingImageSource(
   trainingName?: string | null,
   trainingId?: number,
 ) {
-  if (imageUrl && LOCAL_IMAGES[imageUrl]) {
-    return LOCAL_IMAGES[imageUrl];
+  const normalizedImageUrl = imageUrl?.trim().toLowerCase();
+  const imageFileName = normalizedImageUrl?.split(/[\\/]/).pop();
+
+  if (imageFileName && LOCAL_IMAGES[imageFileName]) {
+    return LOCAL_IMAGES[imageFileName];
   }
   if (imageUrl && /^https?:\/\//i.test(imageUrl)) {
     return { uri: imageUrl };
@@ -66,6 +69,7 @@ export const TrainingCard = ({ training, onPress, isManager, onToggleActive }: T
         source={imageSource} 
         style={styles.imageBackground}
         imageStyle={styles.image}
+        resizeMode="cover"
       >
         <View style={styles.overlay}>
           <View style={styles.header}>
