@@ -20,11 +20,20 @@ export default function PreAuthScannerScreen({ navigation }: Props) {
 
   const handleBarCodeScanned = ({ type, data }: { type: string; data: string }) => {
     setScanned(true);
-    // Extraire l'ID si c'est une URL
-    let extractedId = data;
-    if (data.includes('managerId=')) {
-      extractedId = data.split('managerId=')[1].split('&')[0];
+    const rawData = data.trim();
+    let extractedId = rawData;
+
+    try {
+      const parsedUrl = new URL(rawData);
+      extractedId = parsedUrl.searchParams.get('managerId') || rawData;
+    } catch {
+      const managerIdMatch = rawData.match(/[?&]managerId=([^&]+)/i);
+      if (managerIdMatch) {
+        extractedId = decodeURIComponent(managerIdMatch[1]);
+      }
     }
+
+    extractedId = extractedId.trim();
 
     Alert.alert(
       'Action Requise',

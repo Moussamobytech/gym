@@ -33,14 +33,21 @@ export default function RegisterScreen({ route, navigation }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ firstName, lastName, phoneNumber, password, managerQrCodeId: managerId }),
       });
-      
+
+      const responseText = await response.text();
+      let responseData: { message?: string } = {};
+      try {
+        responseData = responseText ? JSON.parse(responseText) : {};
+      } catch {
+        responseData = {};
+      }
+
       if (response.ok) {
         Alert.alert('Succès', 'Compte créé ! Vous pouvez maintenant vous connecter.', [
           { text: 'OK', onPress: () => navigation.navigate('Login') }
         ]);
       } else {
-        const err = await response.text();
-        Alert.alert('Erreur', err || 'Erreur lors de l\'inscription');
+        Alert.alert('Erreur', responseData.message || responseText || 'Erreur lors de l\'inscription');
       }
     } catch (error) {
       Alert.alert('Erreur réseau', 'Impossible de se connecter au serveur');
