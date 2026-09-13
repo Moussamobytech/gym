@@ -10,6 +10,8 @@ interface TrainingCardProps {
   onToggleActive?: (id: number) => void;
 }
 
+import { API_URL } from '../config';
+
 const LOCAL_IMAGES: Record<string, any> = {
   "musculation.jpg": require('../../assets/trainings/musculation.jpg'),
   "cardio.jpg": require('../../assets/trainings/cardio.jpg'),
@@ -21,14 +23,18 @@ const LOCAL_IMAGES: Record<string, any> = {
 const IMAGE_KEYS = Object.keys(LOCAL_IMAGES);
 
 function getImageKeyFromName(name?: string | null) {
-  const normalizedName = name?.trim().toLowerCase();
-  if (!normalizedName) return null;
+  if (!name) return null;
+  const normalizedName = name
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 
-  if (normalizedName.includes('cardio')) return 'cardio.jpg';
-  if (normalizedName.includes('yoga')) return 'yoga.jpg';
-  if (normalizedName.includes('crossfit') || normalizedName.includes('cross fit')) return 'crossfit.jpg';
-  if (normalizedName.includes('zumba')) return 'zumba.jpg';
-  if (normalizedName.includes('musculation') || normalizedName.includes('muscu')) return 'musculation.jpg';
+  if (normalizedName.includes('cardio') || normalizedName.includes('tapis') || normalizedName.includes('velo') || normalizedName.includes('rameur') || normalizedName.includes('endurance')) return 'cardio.jpg';
+  if (normalizedName.includes('yoga') || normalizedName.includes('relax') || normalizedName.includes('etirement') || normalizedName.includes('souplesse') || normalizedName.includes('pilates')) return 'yoga.jpg';
+  if (normalizedName.includes('crossfit') || normalizedName.includes('cross fit') || normalizedName.includes('cross') || normalizedName.includes('hiit')) return 'crossfit.jpg';
+  if (normalizedName.includes('zumba') || normalizedName.includes('danse') || normalizedName.includes('dance')) return 'zumba.jpg';
+  if (normalizedName.includes('musculation') || normalizedName.includes('muscu') || normalizedName.includes('poids') || normalizedName.includes('force') || normalizedName.includes('haltere') || normalizedName.includes('machine')) return 'musculation.jpg';
 
   return null;
 }
@@ -38,21 +44,39 @@ export function getTrainingImageSource(
   trainingName?: string | null,
   trainingId?: number,
 ) {
-  const normalizedImageUrl = imageUrl?.trim().toLowerCase();
-  const imageFileName = normalizedImageUrl?.split(/[\\/]/).pop();
+  const trimmedUrl = imageUrl?.trim();
+  if (trimmedUrl) {
+    const lowerUrl = trimmedUrl.toLowerCase();
 
-  if (imageFileName && LOCAL_IMAGES[imageFileName]) {
-    return LOCAL_IMAGES[imageFileName];
-  }
-  if (imageUrl && /^https?:\/\//i.test(imageUrl)) {
-    return { uri: imageUrl };
+    // Check remote, data URI, or file URI
+    if (/^(https?:\/\/|data:image\/|file:\/\/)/i.test(trimmedUrl)) {
+      return { uri: trimmedUrl };
+    }
+
+    // Check relative path starting with /
+    if (trimmedUrl.startsWith('/')) {
+      const baseUrl = API_URL.replace(/\/api\/?$/, '');
+      return { uri: `${baseUrl}${trimmedUrl}` };
+    }
+
+    // Check local filenames
+    const fileName = lowerUrl.split(/[\\/]/).pop() || '';
+    if (fileName && LOCAL_IMAGES[fileName]) {
+      return LOCAL_IMAGES[fileName];
+    }
+    const fileNameWithJpg = `${fileName.replace(/\.(jpg|jpeg|png|webp)$/i, '')}.jpg`;
+    if (LOCAL_IMAGES[fileNameWithJpg]) {
+      return LOCAL_IMAGES[fileNameWithJpg];
+    }
   }
 
   const imageKey = getImageKeyFromName(trainingName);
-  if (imageKey) return LOCAL_IMAGES[imageKey];
+  if (imageKey && LOCAL_IMAGES[imageKey]) {
+    return LOCAL_IMAGES[imageKey];
+  }
 
   const fallbackIndex = Math.abs(trainingId ?? 0) % IMAGE_KEYS.length;
-  return LOCAL_IMAGES[IMAGE_KEYS[fallbackIndex]];
+  return LOCAL_IMAGES[IMAGE_KEYS[fallbackIndex]] || LOCAL_IMAGES["musculation.jpg"];
 }
 
 export const TrainingCard = ({ training, onPress, isManager, onToggleActive }: TrainingCardProps) => {
