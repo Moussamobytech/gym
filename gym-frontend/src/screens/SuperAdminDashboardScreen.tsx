@@ -80,7 +80,7 @@ export default function SuperAdminDashboardScreen({ navigation }: Props) {
           <Text style={styles.userPhone}>{item.phoneNumber}</Text>
         </View>
         <View style={[styles.roleBadge, item.role === 'MANAGER' ? styles.badgeManager : styles.badgeClient]}>
-          <Text style={[styles.roleText, item.role === 'MANAGER' ? styles.textManager : styles.textClient]}>
+          <Text style={[item.role === 'MANAGER' ? styles.textManager : styles.textClient]}>
             {item.role === 'SUPER_ADMIN' ? 'ADMIN' : item.role}
           </Text>
         </View>
@@ -88,7 +88,7 @@ export default function SuperAdminDashboardScreen({ navigation }: Props) {
       
       <View style={styles.cardFooter}>
         <Text style={styles.dateText}>
-          Inscrit le {new Date(item.createdAt).toLocaleDateString()}
+          Inscrit le {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Non renseigné'}
         </Text>
         {item.role !== 'SUPER_ADMIN' && (
           <TouchableOpacity 

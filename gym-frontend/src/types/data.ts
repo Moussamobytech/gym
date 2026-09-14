@@ -11,9 +11,10 @@ export interface User {
   firstName: string;
   lastName: string;
   phoneNumber: string;
-  role: 'MANAGER' | 'CLIENT';
+  role: 'MANAGER' | 'CLIENT' | 'SUPER_ADMIN';
   subscriptionEndDate?: string;
-  paymentStatus?: 'PENDING' | 'PAID' | 'OVERDUE';
+  paymentStatus?: 'PENDING' | 'PAID' | 'EXPIRED' | 'OVERDUE';
+  createdAt?: string;
 }
 
 export interface Notification {

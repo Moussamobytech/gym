@@ -49,7 +49,7 @@ export default function ClientHomeScreen({ navigation }: Props) {
 
   const filteredTrainings = trainings.filter((t) => {
     const matchesSearch = t.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          t.description.toLowerCase().includes(searchQuery.toLowerCase());
+                          (t.description || '').toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'Tous' || 
                             t.name.toLowerCase().includes(selectedCategory.toLowerCase());
     return matchesSearch && matchesCategory;
