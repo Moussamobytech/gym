@@ -77,9 +77,9 @@ export default function ClientHomeScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  listContent: { padding: 24, paddingTop: 48 },
-  headerContainer: { marginBottom: 24 },
-  sectionTitle: { color: colors.primary, fontSize: 24, fontWeight: 'bold', marginBottom: 8 },
-  subtitle: { color: colors.textSecondary, fontSize: 14, marginBottom: 16 },
+  listContent: { paddingHorizontal: 24, paddingTop: 48, paddingBottom: 16 },
+  headerContainer: { marginBottom: 16 },
+  sectionTitle: { color: colors.primary, fontSize: 24, fontWeight: 'bold', marginBottom: 6 },
+  subtitle: { color: colors.textSecondary, fontSize: 14 },
   emptyText: { color: colors.textSecondary, fontSize: 15, textAlign: 'center', marginTop: 24 }
 });
