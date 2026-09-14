@@ -87,7 +87,7 @@ export const TrainingCard = ({ training, onPress, isManager, onToggleActive }: T
       style={styles.cardContainer} 
       onPress={onPress}
       disabled={!onPress}
-      activeOpacity={0.85}
+      activeOpacity={0.88}
     >
       <ImageBackground 
         source={imageSource} 
@@ -95,20 +95,32 @@ export const TrainingCard = ({ training, onPress, isManager, onToggleActive }: T
         imageStyle={styles.image}
         resizeMode="cover"
       >
-        <View style={styles.overlay}>
-          <View style={styles.header}>
-            <Text style={styles.title}>{training.name}</Text>
-            {isManager && (
-              <View style={styles.switchContainer}>
-                <Switch
-                  value={training.active}
-                  onValueChange={() => onToggleActive && onToggleActive(training.id)}
-                  trackColor={{ false: colors.border, true: colors.primaryDark }}
-                  thumbColor={training.active ? colors.primary : colors.textSecondary}
-                />
-              </View>
-            )}
+        <View style={styles.topBadgeRow}>
+          <View style={styles.badgePill}>
+            <Text style={styles.badgeText}>
+              {training.name.toLowerCase().includes('muscu') ? '🏋️ MUSCULATION' : 
+               training.name.toLowerCase().includes('cardio') ? '🏃 CARDIO' : 
+               training.name.toLowerCase().includes('yoga') ? '🧘 YOGA' : 
+               training.name.toLowerCase().includes('cross') ? '⚡ CROSSFIT' : '🔥 ENTRAÎNEMENT'}
+            </Text>
           </View>
+          {isManager && (
+            <View style={styles.switchContainer}>
+              <Text style={[styles.statusText, { color: training.active ? colors.primary : colors.textSecondary }]}>
+                {training.active ? 'ACTIF' : 'INACTIF'}
+              </Text>
+              <Switch
+                value={training.active}
+                onValueChange={() => onToggleActive && onToggleActive(training.id)}
+                trackColor={{ false: 'rgba(255,255,255,0.1)', true: colors.primaryDark }}
+                thumbColor={training.active ? colors.primary : colors.textSecondary}
+              />
+            </View>
+          )}
+        </View>
+
+        <View style={styles.overlay}>
+          <Text style={styles.title}>{training.name}</Text>
           <Text style={styles.description} numberOfLines={2}>
             {training.description}
           </Text>
@@ -120,49 +132,78 @@ export const TrainingCard = ({ training, onPress, isManager, onToggleActive }: T
 
 const styles = StyleSheet.create({
   cardContainer: {
-    height: 200,
-    marginBottom: 24,
+    height: 210,
+    marginBottom: 20,
     borderRadius: 24,
-    elevation: 10,
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.2,
-    shadowRadius: 15,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
     backgroundColor: colors.surface,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 8,
   },
   imageBackground: {
     flex: 1,
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
   },
   image: {
     borderRadius: 24,
   },
-  overlay: {
-    backgroundColor: 'rgba(5, 5, 5, 0.75)',
-    padding: 20,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-  },
-  header: {
+  topBadgeRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    padding: 16,
+  },
+  badgePill: {
+    backgroundColor: 'rgba(9, 10, 15, 0.75)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+  },
+  badgeText: {
+    color: colors.primary,
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(9, 10, 15, 0.85)',
+    borderRadius: 20,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+    gap: 6,
+  },
+  statusText: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  overlay: {
+    backgroundColor: 'rgba(9, 10, 15, 0.88)',
+    padding: 18,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.05)',
   },
   title: {
     color: colors.text,
-    fontSize: 26,
+    fontSize: 22,
     fontWeight: '900',
-    letterSpacing: 0.5,
-  },
-  switchContainer: {
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    borderRadius: 20,
-    padding: 2,
+    letterSpacing: 0.3,
+    marginBottom: 4,
   },
   description: {
     color: colors.textSecondary,
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: 13,
+    lineHeight: 19,
   },
 });

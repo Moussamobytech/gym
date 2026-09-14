@@ -1,23 +1,29 @@
 export interface ThemeColors {
   background: string;
   surface: string;
+  surfaceLight: string;
   primary: string;
   primaryDark: string;
   secondary: string;
+  accent: string;
   error: string;
+  success: string;
   text: string;
   textSecondary: string;
   border: string;
 }
 
 export const colors: ThemeColors = {
-  background: '#050505',
-  surface: '#141414',
+  background: '#090A0F',
+  surface: '#141622',
+  surfaceLight: '#1E2132',
   primary: '#D4FF00',
-  primaryDark: '#A8CC00',
-  secondary: '#FFFFFF',
-  error: '#FF3B30',
+  primaryDark: '#B0D800',
+  secondary: '#00F0FF',
+  accent: '#FF0055',
+  error: '#FF453A',
+  success: '#30D158',
   text: '#FFFFFF',
-  textSecondary: '#8E8E93',
-  border: '#2C2C2E',
+  textSecondary: '#9A9EB3',
+  border: 'rgba(255, 255, 255, 0.08)',
 };

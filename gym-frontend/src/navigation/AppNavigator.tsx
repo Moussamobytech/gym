@@ -39,7 +39,14 @@ function ClientTabs() {
     <ClientTab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.border },
+        tabBarStyle: { 
+          backgroundColor: colors.surface, 
+          borderTopColor: 'rgba(255, 255, 255, 0.08)',
+          height: 64,
+          paddingBottom: 10,
+          paddingTop: 8,
+        },
+        tabBarLabelStyle: { fontWeight: '800', fontSize: 11 },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textSecondary,
         tabBarIcon: ({ focused, color, size }) => {
@@ -53,7 +60,7 @@ function ClientTabs() {
           } else {
             iconName = focused ? 'person' : 'person-outline';
           }
-          return <Ionicons name={iconName} size={size} color={color} />;
+          return <Ionicons name={iconName} size={22} color={color} />;
         },
       })}
     >
@@ -70,7 +77,14 @@ function ManagerTabs() {
     <ManagerTab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.border },
+        tabBarStyle: { 
+          backgroundColor: colors.surface, 
+          borderTopColor: 'rgba(255, 255, 255, 0.08)',
+          height: 64,
+          paddingBottom: 10,
+          paddingTop: 8,
+        },
+        tabBarLabelStyle: { fontWeight: '800', fontSize: 11 },
         tabBarActiveTintColor: colors.secondary,
         tabBarInactiveTintColor: colors.textSecondary,
         tabBarIcon: ({ focused, color, size }) => {
@@ -82,7 +96,7 @@ function ManagerTabs() {
           } else {
             iconName = focused ? 'people' : 'people-outline';
           }
-          return <Ionicons name={iconName} size={size} color={color} />;
+          return <Ionicons name={iconName} size={22} color={color} />;
         },
       })}
     >
@@ -98,8 +112,15 @@ function SuperAdminTabs() {
     <SuperAdminTab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.border },
-        tabBarActiveTintColor: '#cba6f7', // Mocha Mauve for Super Admin
+        tabBarStyle: { 
+          backgroundColor: colors.surface, 
+          borderTopColor: 'rgba(255, 255, 255, 0.08)',
+          height: 64,
+          paddingBottom: 10,
+          paddingTop: 8,
+        },
+        tabBarLabelStyle: { fontWeight: '800', fontSize: 11 },
+        tabBarActiveTintColor: '#cba6f7',
         tabBarInactiveTintColor: colors.textSecondary,
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: keyof typeof Ionicons.glyphMap;
@@ -108,7 +129,7 @@ function SuperAdminTabs() {
           } else {
             iconName = focused ? 'person-add' : 'person-add-outline';
           }
-          return <Ionicons name={iconName} size={size} color={color} />;
+          return <Ionicons name={iconName} size={22} color={color} />;
         },
       })}
     >
