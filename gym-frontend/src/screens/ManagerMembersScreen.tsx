@@ -124,7 +124,7 @@ export default function ManagerMembersScreen({ navigation }: Props) {
     } else {
       const status = type === 'ACCEPT' ? 'PAID' : 'EXPIRED';
       try {
-        const res = await fetch(`${API_URL}/manager/members/${memberId}/status`, {
+        const res = await fetch(`${API_URL}/manager/members/${memberId}`, {
           method: 'PUT',
           headers: { 
             'Content-Type': 'application/json',
