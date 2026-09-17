@@ -203,6 +203,18 @@ export default function ManagerProfileScreen() {
    * =========================
    */
   const handleLogout = () => {
+    if (Platform.OS === 'web') {
+      const confirmed = globalThis.confirm(
+        'Voulez-vous vraiment vous déconnecter de votre espace manager ?'
+      );
+
+      if (confirmed) {
+        void logout();
+      }
+
+      return;
+    }
+
     Alert.alert(
       'Déconnexion',
       'Voulez-vous vraiment vous déconnecter de votre espace manager ?',
