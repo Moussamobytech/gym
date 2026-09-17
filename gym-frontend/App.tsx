@@ -27,11 +27,13 @@ export default function App() {
 const styles = StyleSheet.create({
   webRoot: {
     flex: 1,
+    minHeight: '100vh',
     backgroundColor: '#000', // Noir profond pour les bords du site
     alignItems: 'center',
   },
   webContainer: {
     flex: 1,
+    minHeight: '100vh',
     width: '100%',
     maxWidth: 480, // Taille d'un grand smartphone
     backgroundColor: colors.background,

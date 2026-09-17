@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
+import { Platform } from 'react-native';
 
 import { colors } from '../theme/colors';
 import { AuthContext } from '../context/AuthContext';
@@ -42,8 +43,8 @@ function ClientTabs() {
         tabBarStyle: { 
           backgroundColor: colors.surface, 
           borderTopColor: 'rgba(255, 255, 255, 0.08)',
-          height: 64,
-          paddingBottom: 10,
+          height: Platform.OS === 'web' ? 76 : 64,
+          paddingBottom: Platform.OS === 'web' ? 12 : 10,
           paddingTop: 8,
         },
         tabBarLabelStyle: { fontWeight: '800', fontSize: 11 },
@@ -80,8 +81,8 @@ function ManagerTabs() {
         tabBarStyle: { 
           backgroundColor: colors.surface, 
           borderTopColor: 'rgba(255, 255, 255, 0.08)',
-          height: 64,
-          paddingBottom: 10,
+          height: Platform.OS === 'web' ? 76 : 64,
+          paddingBottom: Platform.OS === 'web' ? 12 : 10,
           paddingTop: 8,
         },
         tabBarLabelStyle: { fontWeight: '800', fontSize: 11 },
@@ -115,8 +116,8 @@ function SuperAdminTabs() {
         tabBarStyle: { 
           backgroundColor: colors.surface, 
           borderTopColor: 'rgba(255, 255, 255, 0.08)',
-          height: 64,
-          paddingBottom: 10,
+          height: Platform.OS === 'web' ? 76 : 64,
+          paddingBottom: Platform.OS === 'web' ? 12 : 10,
           paddingTop: 8,
         },
         tabBarLabelStyle: { fontWeight: '800', fontSize: 11 },
