@@ -19,10 +19,12 @@ import { colors } from '../theme/colors';
 import { AuthContext } from '../context/AuthContext';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
+import { useAlert } from '../components/CustomAlert';
 import { API_URL } from '../config';
 
 export default function ManagerProfileScreen() {
   const { authState, logout } = useContext(AuthContext);
+  const { showAlert, AlertComponent } = useAlert();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -203,22 +205,11 @@ export default function ManagerProfileScreen() {
    * =========================
    */
   const handleLogout = () => {
-    if (Platform.OS === 'web') {
-      const confirmed = globalThis.confirm(
-        'Voulez-vous vraiment vous déconnecter de votre espace manager ?'
-      );
-
-      if (confirmed) {
-        void logout();
-      }
-
-      return;
-    }
-
-    Alert.alert(
-      'Déconnexion',
-      'Voulez-vous vraiment vous déconnecter de votre espace manager ?',
-      [
+    showAlert({
+      type: 'warning',
+      title: 'Déconnexion',
+      message: 'Voulez-vous vraiment vous déconnecter de votre espace manager ?',
+      buttons: [
         {
           text: 'Annuler',
           style: 'cancel',
@@ -226,10 +217,10 @@ export default function ManagerProfileScreen() {
         {
           text: 'Se déconnecter',
           style: 'destructive',
-          onPress: logout,
+          onPress: () => { void logout(); },
         },
-      ]
-    );
+      ],
+    });
   };
 
   /**
@@ -269,6 +260,8 @@ export default function ManagerProfileScreen() {
           : undefined
       }
     >
+      {AlertComponent}
+
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.contentContainer}

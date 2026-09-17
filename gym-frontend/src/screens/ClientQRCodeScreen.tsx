@@ -12,6 +12,7 @@ export default function ClientQRCodeScreen({ navigation }: Props) {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState(false);
   const [showActionModal, setShowActionModal] = useState(false);
+  const [scannedManagerQrCodeId, setScannedManagerQrCodeId] = useState<string | null>(null);
   const { authState } = useContext(AuthContext);
 
   useEffect(() => {
@@ -22,12 +23,16 @@ export default function ClientQRCodeScreen({ navigation }: Props) {
     getBarCodeScannerPermissions();
   }, []);
 
-  const handleAction = async (action: 'CHECKIN' | 'RENEW') => {
+  const handleAction = async (action: 'CHECKIN' | 'RENEW', managerQrCodeId: string) => {
     try {
       const endpoint = action === 'CHECKIN' ? '/client/checkin' : '/client/renew';
       const response = await fetch(`${API_URL}${endpoint}`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${authState.jwt}` }
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authState.jwt}`,
+        },
+        body: JSON.stringify({ managerQrCodeId }),
       });
       
       const text = await response.text();
@@ -48,9 +53,18 @@ export default function ClientQRCodeScreen({ navigation }: Props) {
     }
   };
 
-  const handleBarCodeScanned = ({ type, data }: { type: string; data: string }) => {
+  const handleBarCodeScanned = ({ data }: { type: string; data: string }) => {
+    let managerQrCodeId = data;
+
+    try {
+      managerQrCodeId = new URL(data).searchParams.get('managerId') || data;
+    } catch {
+      // The QR value can also be a raw manager QR code id.
+    }
+
     setScanned(true);
     setShowActionModal(true);
+    setScannedManagerQrCodeId(managerQrCodeId);
   };
 
   if (hasPermission === null) return <View style={styles.container}><Text style={styles.text}>Demande d'autorisation de la caméra...</Text></View>;
@@ -79,19 +93,29 @@ export default function ClientQRCodeScreen({ navigation }: Props) {
 
             <TouchableOpacity 
               style={styles.modalBtnPrimary} 
-              onPress={() => { setShowActionModal(false); handleAction('CHECKIN'); }}>
+              onPress={() => {
+                setShowActionModal(false);
+                if (scannedManagerQrCodeId) handleAction('CHECKIN', scannedManagerQrCodeId);
+              }}>
               <Text style={styles.modalBtnPrimaryText}>Pointer ma présence</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
               style={styles.modalBtnSecondary} 
-              onPress={() => { setShowActionModal(false); handleAction('RENEW'); }}>
+              onPress={() => {
+                setShowActionModal(false);
+                if (scannedManagerQrCodeId) handleAction('RENEW', scannedManagerQrCodeId);
+              }}>
               <Text style={styles.modalBtnSecondaryText}>Renouveler l'abonnement</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
               style={styles.modalBtnCancel} 
-              onPress={() => { setShowActionModal(false); setScanned(false); }}>
+              onPress={() => {
+                setShowActionModal(false);
+                setScanned(false);
+                setScannedManagerQrCodeId(null);
+              }}>
               <Text style={styles.modalBtnCancelText}>Annuler</Text>
             </TouchableOpacity>
           </View>
