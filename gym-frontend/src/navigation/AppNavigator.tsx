@@ -142,7 +142,7 @@ function SuperAdminTabs() {
 
 export default function AppNavigator() {
   const { authState, isLoading } = useContext(AuthContext) as AuthContextType & { isLoading: boolean };
-  const { expoPushToken } = usePushNotifications();
+  const { expoPushToken } = usePushNotifications(authState.jwt);
 
   useEffect(() => {
     if (authState.jwt && expoPushToken) {

@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthUser } from '@/lib/auth';
-import { sendExpoPushNotification } from '@/lib/pushNotifications';
+import { createAndSendNotification } from '@/lib/pushNotifications';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ qrCodeId: string }> }) {
   try {
@@ -18,15 +18,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ qrC
 
     await prisma.checkIn.create({ data: { userId: user.id } });
 
-    // Send push notification if client has a pushToken
-    if (user.pushToken) {
-      sendExpoPushNotification({
-        to: user.pushToken,
-        title: '✅ Accès Validé',
-        body: `Bonjour ${user.firstName || 'Adhérent'}, votre entrée dans la salle a été enregistrée avec succès !`,
-        data: { type: 'CHECK_IN', userId: user.id }
-      }).catch(err => console.error('Erreur push checkin:', err));
-    }
+    // Enregistrer la notification en BDD (visible sur le web) et envoyer le Push Expo si token mobile present
+    await createAndSendNotification({
+      userId: user.id,
+      title: '✅ Accès Validé',
+      message: `Bonjour ${user.firstName || 'Adhérent'}, votre entrée dans la salle a été enregistrée avec succès !`,
+      data: { type: 'CHECK_IN', userId: user.id }
+    }).catch(err => console.error('Erreur notification checkin:', err));
 
     return NextResponse.json({ 
       message: 'Check-in réussi pour : ' + (user.firstName || '') + ' ' + (user.lastName || ''),

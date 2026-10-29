@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthUser } from '@/lib/auth';
-import { sendExpoPushNotification } from '@/lib/pushNotifications';
+import { createAndSendNotification } from '@/lib/pushNotifications';
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -10,7 +10,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ message: 'Non autorise' }, { status: 401 });
     }
     const { id } = await params;
-    const memberId = parseInt(id);
+    const memberId = parseInt(id, 10);
     const { status } = await req.json();
 
     const endDate = status === 'PAID'
@@ -25,16 +25,14 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       }
     });
 
-    // Send push notification to member if token exists
-    if (member.pushToken) {
-      const statusLabel = status === 'PAID' ? 'Payé (Actif 30 jours)' : status === 'EXPIRED' ? 'Expiré' : 'En attente';
-      sendExpoPushNotification({
-        to: member.pushToken,
-        title: '💳 Statut d\'Abonnement',
-        body: `Votre statut d'abonnement à la salle a été mis à jour : ${statusLabel}`,
-        data: { type: 'SUBSCRIPTION_UPDATE', status: member.paymentStatus }
-      }).catch(err => console.error('Erreur push abonnement:', err));
-    }
+    // Enregistrer la notification en BDD et envoyer le Push
+    const statusLabel = status === 'PAID' ? 'Payé (Actif 30 jours)' : status === 'EXPIRED' ? 'Expiré' : 'En attente';
+    await createAndSendNotification({
+      userId: memberId,
+      title: '💳 Statut d\'Abonnement',
+      message: `Votre statut d'abonnement à la salle a été mis à jour : ${statusLabel}`,
+      data: { type: 'SUBSCRIPTION_UPDATE', status: member.paymentStatus }
+    }).catch(err => console.error('Erreur notification abonnement:', err));
 
     return NextResponse.json(member);
   } catch (error) {
@@ -50,7 +48,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
       return NextResponse.json({ message: 'Non autorise' }, { status: 401 });
     }
     const { id } = await params;
-    const memberId = parseInt(id);
+    const memberId = parseInt(id, 10);
 
     await prisma.checkIn.deleteMany({ where: { userId: memberId } });
     await prisma.user.delete({ where: { id: memberId } });

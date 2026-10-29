@@ -34,6 +34,17 @@ model User {
   createdAt           DateTime       @default(now())
   pushToken           String?
   checkIns            CheckIn[]
+  notifications       Notification[]
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
 
 model Training {

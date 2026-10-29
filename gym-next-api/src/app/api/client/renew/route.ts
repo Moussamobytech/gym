@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthUser } from '@/lib/auth';
-import { sendExpoPushNotification } from '@/lib/pushNotifications';
+import { createAndSendNotification } from '@/lib/pushNotifications';
 
 export async function POST(req: NextRequest) {
   try {
@@ -40,14 +40,13 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    if (manager.pushToken) {
-      sendExpoPushNotification({
-        to: manager.pushToken,
-        title: 'Nouvelle demande de renouvellement',
-        body: `${client.firstName || 'Un client'} ${client.lastName || ''} demande le renouvellement de son abonnement.`,
-        data: { type: 'RENEWAL_REQUEST', userId: client.id },
-      }).catch(error => console.error('Erreur push renouvellement:', error));
-    }
+    // Enregistrer la notification en BDD et envoyer le Push Expo au manager
+    await createAndSendNotification({
+      userId: manager.id,
+      title: '📋 Nouvelle demande de renouvellement',
+      message: `${client.firstName || 'Un client'} ${client.lastName || ''} demande le renouvellement de son abonnement.`,
+      data: { type: 'RENEWAL_REQUEST', userId: client.id },
+    }).catch(error => console.error('Erreur notification renouvellement:', error));
 
     return NextResponse.json({
       message: 'Demande de renouvellement envoyee au gerant.',
