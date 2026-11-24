@@ -35,7 +35,7 @@
     "web": "expo start --web",
     "build:web": "expo export -p web",
     "build": "npm run build:web",
-    "postbuild": "mv web-build dist"
+    "postbuild": "move web-build dist"
   },
   "private": true,
   "devDependencies": {
