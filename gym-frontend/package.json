@@ -35,7 +35,7 @@
     "web": "expo start --web",
     "build:web": "expo export -p web",
     "build": "npm run build:web",
-    "postbuild": "move web-build dist"
+    "postbuild": "node -e \"const fs=require('fs');fs.renameSync('web-build','dist');\""
   },
   "private": true,
   "devDependencies": {
